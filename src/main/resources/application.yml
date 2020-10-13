@@ -1,0 +1,51 @@
+server:
+  port: 8181
+spring:
+  datasource:
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/worktest?useUnicode=true&characterEncoding=utf8
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 1 from dual
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+    name: worktest
+
+  thymeleaf:
+    cache: false
+    suffix: .html
+    prefix: classpath:/templates/
+    mode: HTML5
+    servlet:
+      content-type: text/html
+    enabled: true
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.gql.entity
+  configuration:
+    map-underscore-to-camel-case: true
+security-config:
+  loginUrl: /user/login
+  permitAllUrls: /validata/code
+  ignoredUrls: /,/login,/swagger-ui.html,/swagger-resources/**,/webjars/springfox-swagger-ui/**,/v2/api-docs/**,/css/**,/fonts/**,/img/**,/imgs/**,/js/**,/favicon.ico,/api/setLocal,/api/oauth/**,/api/demo/**,/api/info/**,/api/draft/**,/api/task/**,/api/common/**,/static/**
+jwt:
+  header: Authorization
+  secret: ofaffadfev1234567--090swctewst
+  expiration: 86400
+  tokenPrefix: "Bearer "
+  notAjaxUrl: /index
+#logging:
+#  level:
+#    root: debug
+logging:
+  config: classpath:log4j.properties
+  com.gql.*: debug

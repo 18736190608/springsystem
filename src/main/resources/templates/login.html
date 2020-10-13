@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆页</title>
+    <script th:src="@{/js/jquery-2.1.4.js}"></script>
+    <link rel="stylesheet" th:href="@{../layui/css/layui.css}" media="all"/>
+    <link rel="stylesheet" th:href="@{/css/login.css}"/>
+</head>
+<body>
+<div class="wrap">
+    <img th:src="@{picture/back.jpg}" class="imgStyle">
+    <div class="loginForm">
+        <form>
+            <div class="logoHead">
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>用户名:</label>
+                </div>
+                <div class="usernameDiv">
+                    <i class="layui-icon layui-icon-username adminIcon"></i>
+                    <input id="loginUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名" >
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>密码:</label>
+                </div>
+                <div class="passwordDiv">
+                    <i class="layui-icon layui-icon-password adminIcon"></i>
+                    <input id="loginPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>验证码:</label>
+                </div>
+                <div class="cardDiv" style="cursor:pointer">
+                    <input id="loginCard" class="layui-input cardInput" type="text" name="card" placeholder="输入验证码">
+                </div>
+                <div class="codeDiv">
+                    <img id="validataCode" class="layui-input codeInput"  th:src="@{validata/code}" onclick="createValidateCode()" alt="验证码">
+                   <!-- <input id="loginCode" class="layui-input codeInput"  type="button">-->
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="submitLabel">
+                    <label>没有账号？<a href="#" id="loginRegister">点击注册</a></label>
+                </div>
+                <div class="submitDiv">
+                    <input id="loginBtn" onclick="login()" type="button" class="submit layui-btn layui-btn-primary" value="登录"></input>
+                </div>
+            </div>
+        </form>
+        <script th:src="@{/layui/layui.js}" type="text/javascript"></script>
+        <script>
+          layui.use(['layer'],function () {
+            var layer = layui.layer;
+          })
+          $(function () {
+            // 页面初始化生成验证码
+            window.onload = createValidateCode();
+          });
+
+
+          function createValidateCode(){
+            $("#validataCode").attr("src",'validata/code?'+(new Date().getMilliseconds()));
+          }
+
+          // 校验验证码、用户名、密码
+          function validateCode(inputID,codeID) {
+            var inputCode = $(inputID).val().toUpperCase();
+            var loginUsername = $('#loginUsername').val();
+            var loginPassword = $('#loginPassword').val();
+            if ($.trim(loginUsername) == '' || $.trim(loginUsername).length<=0){
+              layer.alert("用户名不能为空");
+              return false;
+            }
+            if ($.trim(loginPassword) == '' || $.trim(loginPassword).length<=0){
+              layer.alert("密码不能为空");
+              return false;
+            }
+            if (inputCode.length<=0){
+              layer.alert("验证码不能为空");
+              return false;
+            }
+            return true;
+          }
+          // 登录流程
+          function login() {
+            if (!validateCode('#loginCard','#loginCode')){
+              //阻断提示
+            }else {
+              var loginUsername = $('#loginUsername').val();
+              var loginPassword = $('#loginPassword').val();
+              var inputCode = $("#loginCard").val().toUpperCase();
+              var params = {};
+              params.username = loginUsername;
+              params.password = loginPassword;
+              params.validataCode = inputCode;
+
+              var loginLoadIndex = layer.load(2);
+              $('#loginBtn').val("正在登录...");
+              $.ajax({
+                type:'POST',
+                url:'/user/login',
+                dataType:'text',
+                data:{
+                  'username': loginUsername,
+                  'password' : loginPassword,
+                  'validataCode' : inputCode
+                },
+               // contentType:'application/json',
+                success:function (data) {
+                  layer.close(loginLoadIndex);
+                  console.log(data)
+                  let parseData = JSON.parse(data);
+                  let statusCode = parseData.code;
+                  window.sessionStorage.setItem('token',parseData.data.token);
+                  window.sessionStorage.setItem('username',parseData.data.username);
+                  console.log(statusCode);
+                  $('#loginBtn').val("登录");
+                  if (parseData.msg != "" && parseData.msg != undefined && parseData.msg != "system.result.success" ){
+                    alert(parseData.msg);
+                    return ;
+                  }
+                  if (statusCode == '10000'){
+                    window.location.href = "/api/index?Authorization="+parseData.data.token;
+                  }
+                },
+                error:function (data) {
+                  layer.close(loginLoadIndex);
+
+                  $('#loginBtn').val("登录");
+                  console.log(data)
+                }
+              });
+            }
+
+          }
+
+        </script>
+    </div>
+</div>
+
+
+</body>
+
+</html>

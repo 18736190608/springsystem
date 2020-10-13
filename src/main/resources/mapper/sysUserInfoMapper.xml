@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gql.dao.SysUserInfoDao">
+
+
+    <select id="getUserInfo" parameterType="string" resultType="com.gql.entity.UserInfoEntity">
+        select * from sys_user s
+        where s.username = #{username}
+    </select>
+
+    <resultMap id="map" type="com.gql.entity.UserInfoEntity">
+        <id property="id" column="ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="email" column="email"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="enabled" column="enable"/>
+        <result property="isOline" column="IS_online"/>
+        <result property="mobile" column="mobile"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="oprationBy" column="opration_by"/>
+        <result property="oprationTime" column="opration_time"/>
+        <collection property="roleList" ofType="com.gql.entity.RoleEntity" javaType="list">
+            <id property="id" column="id"/>
+            <result property="roleName" column="role_name"/>
+            <result property="roleKey" column="role_key"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="oprationBy" column="opration_by"/>
+            <result property="oprationTime" column="opration_time"/>
+            <result property="status" column="status"/>
+            <result property="delFlag" column="del_flag"/>
+
+        </collection>
+    </resultMap>
+    <select id="getRoleUser" parameterType="string" resultMap="map">
+        select u.id,u.username,u.PASSWORD,sr.role_key,sr.role_name
+        from sys_user u left join sys_user_role s on u.id = s.user_id
+        left join sys_role sr on s.role_id = sr.id
+         where u.username= #{username}
+    </select>
+
+    <insert id="userRegister" keyProperty="id" useGeneratedKeys="true" parameterType="com.gql.entity.UserInfoEntity">
+        insert sys_user(
+            username,
+            PASSWORD,
+            EMAIL
+            MOBILE
+            IS_ONLINE
+            ENABLED
+            CREATE_BY
+            CREATE_time
+            OPration_BY
+            OPpration_AT
+            DEL_FLAG
+        )
+        values(
+            #{username},
+            #{password},
+            #{email},
+            #{mobile},
+            #{isOnline},
+            #{enabled},
+            #{createBy},
+            #{createTime},
+            #{oprationBy},
+            #{opprationAt},
+            #{delFlag}
+        )
+
+    </insert>
+
+
+    <select id="getAllUserInfo"  resultType="com.gql.entity.UserInfoEntity">
+       select u.username,u.CREATE_BY,u.CREATE_time,u.DEL_FLAG, u.EMAIL,u.ENABLED,u.id,u.IS_ONLINE,u.MOBILE
+         , u.PASSWORD from sys_user u limit #{pageIndex}, #{offset}
+    </select>
+</mapper>

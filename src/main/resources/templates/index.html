@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>首页</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <script th:src="@{/js/jquery-2.1.4.js}"></script>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">首页</div>
+        <!-- <ul class="layui-nav layui-layout-left">
+             &lt;!&ndash;<li class="layui-nav-item"><a href="">控制台</a></li>
+             <li class="layui-nav-item"><a href="">商品管理</a></li>
+             <li class="layui-nav-item"><a href="">用户</a></li>&ndash;&gt;
+             &lt;!&ndash;<li class="layui-nav-item">
+                 <a href="javascript:;">其它系统</a>
+                 <dl class="layui-nav-child">
+                     <dd><a href="">邮件管理</a></dd>
+                     <dd><a href="">消息管理</a></dd>
+                     <dd><a href="">授权管理</a></dd>
+                 </dl>
+             </li>&ndash;&gt;
+         </ul>-->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a id="showusername" th:text="${username}" href="javascript:;">
+                    <!--<img src="" class="layui-nav-img">-->
+
+                </a>
+            </li>
+            <li class="layui-nav-item">
+                <form th:action="@{/logout}" method="post">
+                    <input type="submit" class="layui-btn layui-btn-sm" value="退出">
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul id="nav-menus" class="layui-nav  layui-nav-tree" lay-filter="test">
+                <li th:each="menus : ${maps}" class="layui-nav-item layui-nav-itemed">
+                    <a href="javascript:;" th:text="${menus.name}">默认展开</a>
+                    <dl th:each=" menusname, index : ${menus.children}" class="layui-nav-child">
+                        <dd><a class="opration-menusname" href="javascript:;" th:data-url="${menusname.menuUrl}" th:data-id="${menusname.id}" th:text="${menusname.name}"></a></dd>
+
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+
+
+        <!-- 内容主体区域 -->
+
+        <div class="layui-body" style="overflow-y: hidden;">
+            <!--   动态选项卡   -->
+            <div class="layui-tab" lay-filter="demo" lay-allowclose="true">
+                <!-- 标题 -->
+                <ul class="layui-tab-title">
+                    <li class="layui-this" lay-id="11">首页</li>
+                </ul>
+                <!-- 内容 -->
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-row layui-col-space15" style="padding: 20px;background-color: #F2F2F2;">
+                            <div class="layui-col-md6">
+                                <div class="layui-card">
+                                    <div class="layui-card-header">欢迎使用</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        © layui.com - 底部固定区域
+    </div>
+</div>
+<script th:src="@{/layui/layui.js}"></script>
+
+<script>
+  //JavaScript代码区域
+  $(function () {
+    $.ajax({
+      type: 'GET',
+      url: '/api/initindex',
+      dataType: 'text',
+      // contentType:'application/json',
+      success: function (data) {
+        console.log(data);
+
+      }
+    });
+  });
+
+
+
+  layui.use('element', function () {
+    let element = layui.element;
+    $("body").on("click", ".opration-menusname", function (e) {
+      let url = $(this).data("url");
+      let id = $(this).data("id");
+      let text = $(this).text();
+
+      //如果不存在
+      if ($(".layui-tab-title").find("li[lay-id='" + id + "']").length <= 0) {
+        let height = document.documentElement.clientHeight - 160 + "px";
+        element.tabAdd('demo', {
+          title: text,
+          //iframe子页面onload新增监听src为/loginPage是父页面跳转/loginPage，解决“俄罗斯套娃”问题
+          content: "<iframe onload='if(this.contentWindow.location.pathname == \"/loginPage\"){window.location.href = \"/loginPage\"} $(this)[0].height = document.documentElement.clientHeight-160' width='100%' height='" + height + "' frameborder='0' scrolling='auto' src=\"" + url + "\"></iframe>",
+          id: id
+        });
+      }
+      element.tabChange('demo', id);
+    });
+  });
+
+
+
+
+
+ /* $(function () {
+    var item = window.sessionStorage.getItem("username");
+    var token = window.sessionStorage.getItem("token");
+    $("#showusername").html(item);
+    $.ajax({
+      type: 'POST',
+      headers: {
+        'Authorization': token
+      },
+      url: '/sys/rolemenu',
+      success: function (data) {
+        console.log(data);
+        var array = data.data;
+        var ulhtml = $("#nav-menus");
+        ulhtml.empty();
+        var tatailHtml = "";
+        for (var i = 0; i < array.length; i++) {
+          var preConethtml = '';
+          var contentHtml = '';
+          var nextContentHtml = '';
+          preConethtml = '<li class="layui-nav-item">\n' +
+              '                 <a href="javascript:;">' + array[i].name + '</a>\n' +
+              '              <dl class="layui-nav-child">\n';
+          let index = 1;
+          for (let j = 0; j < array[i].children.length; j++) {
+            contentHtml += ' <dd style = "padding-left: 35px"><a data-id= "' + index + "" + '" class="site-demo-active" href="javascript:;" data-url="' + array[i].children[j].menuUrl + '" onclick="authopration(' + "'" + array[i].children[j].menuUrl + "'" + ')">' + array[i].children[j].name + '</a></dd>\n';
+            index++;
+          }
+          nextContentHtml =
+              '          </dl>\n' +
+              '          </li>';
+          tatailHtml += preConethtml + contentHtml + nextContentHtml;
+        }
+        ulhtml.append(tatailHtml);
+      },
+      error: function () {
+
+      }
+    })
+  });*/
+
+
+
+/*  layui.use('element', function () {
+    var element = layui.element;
+  });*/
+
+  /*function authopration(url) {
+    var token = window.sessionStorage.getItem("token");
+    $.ajax({
+      type: 'GET',
+      headers: {
+        'Authorization': token
+      },
+      dataType: 'text',
+      data: {
+        'pageIndex': 1,
+        'pageSize': 20
+      },
+      url: url,
+      success: function (data) {
+        $("#table-title").innerHTML = data;
+        console.log(data)
+      },
+      error: function (data) {
+        console.log("error", data)
+      }
+
+    })
+  }*/
+</script>
+<!--<script th:src="@{/js/tableContent.js}"></script>-->
+</body>
+</html>
