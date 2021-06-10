@@ -44,6 +44,8 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
         }
         String tokenPrefix = tokenProperties.getTokenPrefix();
         if (StringUtils.isNotBlank(autheader)) {
+
+            System.out.println(autheader);
             //String token = autheader.substring(tokenPrefix.length());
 
             if (!"".equals(autheader)) {
