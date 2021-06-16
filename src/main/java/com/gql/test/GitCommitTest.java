@@ -101,9 +101,7 @@ class TestMerggin{
         String str = "3458790er6789456789456789045780";
 
         AtomicInteger integer = new AtomicInteger(0);
-
-
-
+        System.out.println("456789");
 
     }
 }
