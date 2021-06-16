@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -90,5 +91,19 @@ class TestSort{
     @Override
     public String toString() {
         return "TestSort{" + "date='" + date + '\'' + ", code='" + code + '\'' + ", context='" + context + '\'' + '}';
+    }
+}
+
+
+
+class TestMerggin{
+    public static void main(String[] args) {
+        String str = "3458790er6789456789456789045780";
+
+        AtomicInteger integer = new AtomicInteger(0);
+
+
+
+
     }
 }
